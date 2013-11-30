@@ -11,12 +11,28 @@ set -e -u
 #
 #########################
 
-# Variables
+# VARIABLES
+my_needed_commands=""
 
-# Functions
+# FUNCTIONS
+
+chk_commands() {
+  missing_counter=0
+  for needed_command in $my_needed_commands; do
+    if ! hash "$needed_command" >/dev/null 2>&1; then
+      printf "Command not found in PATH: %s\n" "$needed_command" >&2
+      ((missing_counter++))
+    fi
+  done
+  
+  if ((missing_counter > 0)); then
+    printf "Minimum %d commands are missing in PATH, aborting\n" "$missing_counter" >&2
+    exit 127
+  fi
+}
 
 err() {
-  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $@" >&2
+  printf "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $@" >&2
 }
 
 
